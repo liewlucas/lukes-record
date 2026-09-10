@@ -1,0 +1,21 @@
+---
+/** Visual Editor renderer for generic `page` stories (trail, porch). Signposts in body render as posts. */
+import { storyblokEditable } from '@storyblok/astro';
+import Signpost from '../components/Signpost.astro';
+import RichText from '../components/RichText.astro';
+import { page } from '../lib/content';
+
+interface Props {
+  blok: Record<string, unknown> & { _uid: string; component: string };
+  slug?: string;
+  name?: string;
+}
+const { blok, slug = 'page', name = 'Page' } = Astro.props;
+const model = page({ slug, full_slug: slug, name, content: blok });
+---
+
+<div {...storyblokEditable(blok as never)} class="wrap" style="padding-block: 3rem; display: grid; gap: 3rem">
+  <h1 class="zone-title">{model.title}</h1>
+  <RichText document={model.body} />
+  {model.signposts.map((post, i) => <Signpost post={post} side={i % 2 === 0 ? 'left' : 'right'} />)}
+</div>

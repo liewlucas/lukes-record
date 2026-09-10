@@ -1,0 +1,17 @@
+---
+import { storyblokEditable } from '@storyblok/astro';
+import Lightbox from '../components/Lightbox.astro';
+import { photo } from '../lib/content';
+
+interface Props {
+  blok: Record<string, unknown> & { _uid: string; component: string };
+  slug?: string;
+  name?: string;
+}
+const { blok, slug = 'preview', name = 'Preview' } = Astro.props;
+const model = photo({ slug, full_slug: slug, name, content: blok });
+---
+
+<div {...storyblokEditable(blok as never)} class="wrap" style="padding-block: 3rem">
+  <Lightbox photo={model} />
+</div>

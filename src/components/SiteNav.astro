@@ -1,0 +1,72 @@
+---
+/** Trail-marker navigation for the 2D layer. Quiet by design; the scene is the real navigation. */
+interface Props {
+  current: 'vista' | 'trail' | 'cabin' | 'porch';
+  /** On the journey page the markers scroll in place; elsewhere they are real links. */
+  inPage?: boolean;
+}
+const { current, inPage = false } = Astro.props;
+const stops = [
+  { id: 'vista', href: inPage ? '#vista' : '/', label: 'Vista' },
+  { id: 'trail', href: inPage ? '#trail' : '/trail', label: 'Trail' },
+  { id: 'cabin', href: inPage ? '#vinyl' : '/cabin', label: 'Cabin' },
+  { id: 'porch', href: inPage ? '#porch' : '/porch', label: 'Porch' },
+];
+---
+
+<nav class="trail-markers" aria-label="Zones">
+  <ul>
+    {stops.map((s) => (
+      <li>
+        <a href={s.href} aria-current={s.id === current ? 'page' : undefined}>{s.label}</a>
+      </li>
+    ))}
+  </ul>
+</nav>
+
+<style>
+  .trail-markers {
+    position: fixed;
+    top: 1rem;
+    right: 1.25rem;
+    z-index: 40;
+  }
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 0.4rem;
+  }
+  a {
+    display: block;
+    padding: 0.35rem 0.7rem 0.3rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    text-decoration: none;
+    color: var(--kraft);
+    background: var(--cabin-wood);
+    border-bottom: 3px solid #2f2218;
+    box-shadow: var(--shadow-object);
+    transition: transform 0.4s var(--ease-settle), background 0.4s var(--ease-settle);
+  }
+  a:hover {
+    transform: translateY(-1px);
+  }
+  a[aria-current='page'] {
+    background: var(--lamp-amber);
+    color: var(--walnut);
+    border-bottom-color: #8d6a2a;
+  }
+  @media (max-width: 480px) {
+    .trail-markers {
+      top: auto;
+      bottom: 0.75rem;
+      right: 0.75rem;
+      left: 0.75rem;
+    }
+    ul {
+      justify-content: center;
+    }
+  }
+</style>

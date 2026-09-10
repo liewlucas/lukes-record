@@ -1,0 +1,345 @@
+---
+/**
+ * The whole walk on one page: vista → trail → cabin (vinyl, photos, books, desk) → porch.
+ * Scroll is the only control. Sections carry `data-scene` keys the 3D camera follows; when the
+ * scene is on, the `.flat` visuals give way to the 3D objects and the text becomes side panels.
+ * Deep-link routes render this component scrolled to their section.
+ */
+import Hero from './Hero.astro';
+import Signpost from './Signpost.astro';
+import VinylShelf from './VinylShelf.astro';
+import PhotoLine from './PhotoLine.astro';
+import Bookshelf from './Bookshelf.astro';
+import Desk from './Desk.astro';
+import Letterbox from './Letterbox.astro';
+import Plaques from './Plaques.astro';
+import RichText from './RichText.astro';
+import { getBooks, getPage, getPhotos, getProjects, getSettings } from '../lib/storyblok';
+
+interface Props {
+  /** Section to start on; the page scrolls here instantly before the scene mounts. */
+  start?: 'vista' | 'trail' | 'cabin' | 'vinyl' | 'photos' | 'books' | 'desk' | 'porch';
+}
+const { start = 'vista' } = Astro.props;
+
+const [settings, projects, photos, books, trail, porch] = await Promise.all([
+  getSettings(),
+  getProjects(),
+  getPhotos(),
+  getBooks(),
+  getPage('trail'),
+  getPage('porch'),
+]);
+---
+
+<div class="journey" data-start={start}>
+  <section class="stop vista" data-scene="vista" id="vista">
+    <Hero settings={settings} />
+  </section>
+
+  <section class="stop trail" data-scene="trail" id="trail" aria-labelledby="trail-h">
+    <div class="wrap">
+      <header class="panel intro">
+        <h2 id="trail-h" class="zone-title">The trail</h2>
+        <p class="zone-intro">Signposts along the way say who lives here. Distance markers say how far each craft has been walked.</p>
+      </header>
+      <div class="path flat" aria-hidden="true"></div>
+      <div class="posts">
+        {trail.signposts.map((post, i) => <Signpost post={post} side={i % 2 === 0 ? 'left' : 'right'} />)}
+      </div>
+    </div>
+  </section>
+
+  <section class="stop cabin-door" data-scene="cabin" id="cabin" aria-labelledby="cabin-h">
+    <div class="lamp-glow flat" aria-hidden="true"></div>
+    <div class="wrap">
+      <a class="cabin-ahead flat" href="#vinyl">
+        <svg viewBox="0 0 160 110" aria-hidden="true">
+          <polygon points="10,60 80,10 150,60" fill="#3a2a1d" />
+          <rect x="24" y="60" width="112" height="46" fill="#4a3828" />
+          <rect x="44" y="72" width="18" height="18" fill="#f0c46b" />
+          <rect x="98" y="72" width="18" height="18" fill="#f0c46b" />
+          <rect x="72" y="76" width="16" height="30" fill="#2b1f15" />
+          <rect x="112" y="22" width="10" height="24" fill="#3a2a1d" />
+        </svg>
+      </a>
+      <header class="panel intro">
+        <h2 id="cabin-h" class="zone-title">The cabin</h2>
+        <p class="zone-intro">Lamp on, needle down. Pull a record to read its liner notes, take a print off the line, or open a book to find the note inside.</p>
+      </header>
+    </div>
+  </section>
+
+  <section class="stop corner" data-scene="vinyl" id="vinyl" aria-labelledby="vinyl-h">
+    <div class="wrap">
+      <header class="panel">
+        <h2 id="vinyl-h">Vinyl shelf</h2>
+        <p class="corner-note">Projects. Featured records sit a little proud of the rest.</p>
+        <ul class="index mono">
+          {projects.map((p) => (
+            <li><a href={`/cabin/vinyl/${p.slug}`}>{p.title}</a>{p.year && <span class="dim"> {p.year}</span>}</li>
+          ))}
+        </ul>
+      </header>
+      <div class="flat"><VinylShelf projects={projects} /></div>
+    </div>
+  </section>
+
+  <section class="stop corner" data-scene="photos" id="photos" aria-labelledby="photos-h">
+    <div class="wrap">
+      <header class="panel">
+        <h2 id="photos-h">Photo wall</h2>
+        <p class="corner-note">Prints pegged on a line. Take one down to read the film notes.</p>
+        <ul class="index mono">
+          {photos.map((p) => <li><a href={`/cabin/photos/${p.slug}`}>{p.caption ?? p.alt}</a></li>)}
+        </ul>
+      </header>
+      <div class="flat"><PhotoLine photos={photos} /></div>
+    </div>
+  </section>
+
+  <section class="stop corner" data-scene="books" id="books" aria-labelledby="books-h">
+    <div class="wrap">
+      <header class="panel">
+        <h2 id="books-h">Bookshelf</h2>
+        <p class="corner-note">Pull a spine. The bookmark inside has a few lines on what stayed with me.</p>
+        <ul class="index mono">
+          {books.map((b) => <li><a href={`/cabin/books#${b.slug}`}>{b.title}</a>{b.author && <span class="dim"> {b.author}</span>}</li>)}
+        </ul>
+      </header>
+      <div class="flat"><Bookshelf books={books} /></div>
+    </div>
+  </section>
+
+  <section class="stop corner desk" data-scene="desk" id="desk" aria-labelledby="desk-h">
+    <div class="wrap">
+      <h2 id="desk-h" class="visually-hidden">The desk</h2>
+      <div class="panel"><Desk ownerName={settings.ownerName} social={settings.social} projectCount={projects.length} /></div>
+    </div>
+  </section>
+
+  <section class="stop porch" data-scene="porch" id="porch" aria-labelledby="porch-h">
+    <div class="wrap">
+      <header class="panel intro">
+        <h2 id="porch-h" class="zone-title">The porch</h2>
+        <p class="zone-intro">Dusk now. The letterbox is by the door, and the plaques beside it say where else to find me.</p>
+        <RichText document={porch.body} />
+      </header>
+      <div class="post">
+        <div class="panel letter-panel"><Letterbox email={settings.email} /></div>
+        <aside class="panel beside">
+          <h3>Brass plaques</h3>
+          <Plaques items={settings.social} />
+          <p class="mono back-home"><a href="#vista">back to the vista</a></p>
+        </aside>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+  // Deep links start part-way along the walk. Jump there before anything animates.
+  const journey = document.querySelector<HTMLElement>('.journey');
+  const start = journey?.dataset.start;
+  if (start && start !== 'vista' && !location.hash) {
+    document.getElementById(start)?.scrollIntoView({ behavior: 'instant', block: 'start' });
+  }
+</script>
+
+<style>
+  .journey {
+    position: relative;
+  }
+  .stop {
+    position: relative;
+    padding-block: var(--space-6);
+  }
+  .stop.vista {
+    padding: 0;
+  }
+
+  /* Trail */
+  .trail {
+    min-height: 220vh;
+  }
+  .trail .intro {
+    max-width: 40rem;
+    margin-bottom: var(--space-5);
+  }
+  .trail .path {
+    position: absolute;
+    top: 16rem;
+    bottom: 6rem;
+    left: 50%;
+    width: 0;
+    border-left: 3px dashed color-mix(in oklab, var(--moss) 60%, var(--parchment));
+    transform: translateX(-50%) rotate(1.2deg);
+  }
+  .trail .wrap {
+    position: relative;
+  }
+  .posts {
+    display: grid;
+    gap: var(--space-6);
+    position: relative;
+  }
+  @media (max-width: 720px) {
+    .trail .path {
+      left: 1.25rem;
+    }
+  }
+
+  /* Cabin door: the light changes here */
+  .cabin-door {
+    min-height: 100vh;
+    display: grid;
+    align-items: center;
+    background: linear-gradient(180deg, var(--parchment) 0%, color-mix(in oklab, var(--parchment) 40%, var(--cabin-dark)) 35%, var(--cabin-dark) 70%);
+    color: var(--ink-on-dark);
+  }
+  .cabin-door .lamp-glow {
+    position: absolute;
+    inset: 30% -20% auto;
+    height: 70vh;
+    background: radial-gradient(ellipse at 22% 40%, rgb(217 164 65 / 0.3), transparent 55%);
+    pointer-events: none;
+  }
+  .cabin-door .wrap {
+    position: relative;
+    display: grid;
+    gap: var(--space-4);
+    justify-items: start;
+  }
+  .cabin-ahead {
+    display: block;
+    width: 9rem;
+    filter: drop-shadow(0 0 24px rgb(217 164 65 / 0.45));
+    transition: transform 0.6s var(--ease-settle);
+  }
+  .cabin-ahead:hover {
+    transform: scale(1.04);
+  }
+  .cabin-door .zone-title {
+    color: var(--parchment);
+  }
+  .cabin-door a {
+    color: var(--lamp-amber);
+  }
+
+  /* Corners share the cabin dark */
+  .corner,
+  .desk {
+    background: var(--cabin-dark);
+    color: var(--ink-on-dark);
+    min-height: 100vh;
+  }
+  .corner a,
+  .desk a {
+    color: var(--lamp-amber);
+  }
+  .corner h2 {
+    font-size: var(--step-2);
+    color: var(--kraft);
+    margin: 0 0 0.4rem;
+  }
+  .corner-note {
+    margin: 0 0 var(--space-4);
+    opacity: 0.75;
+  }
+  .index {
+    display: none;
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-3);
+    font-size: 0.85rem;
+    line-height: 1.9;
+  }
+  .index .dim {
+    opacity: 0.6;
+  }
+  .desk .panel {
+    padding-top: var(--space-4);
+  }
+
+  /* Porch */
+  .porch {
+    min-height: 100vh;
+    background: linear-gradient(180deg, var(--cabin-dark) 0%, color-mix(in oklab, var(--pine-shadow) 70%, var(--dusk)) 25%, var(--dusk) 60%, color-mix(in oklab, var(--dusk) 72%, var(--lamp-amber) 28%) 100%);
+    color: var(--ink-on-dark);
+  }
+  .porch a {
+    color: var(--lamp-amber);
+  }
+  .porch .intro {
+    margin-bottom: var(--space-5);
+  }
+  .porch .zone-title {
+    color: var(--parchment);
+  }
+  .post {
+    display: grid;
+    gap: var(--space-5);
+    align-items: start;
+  }
+  @media (min-width: 900px) {
+    .post {
+      grid-template-columns: minmax(0, 38rem) 1fr;
+    }
+  }
+  .beside h3 {
+    font-size: var(--step-1);
+    color: var(--kraft);
+    margin: 0 0 1rem;
+  }
+  .back-home {
+    margin-top: var(--space-4);
+    font-size: 0.8rem;
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  /* Scene on: the 3D world is the room. Flat visuals step aside; text becomes side panels. */
+  :global(html[data-scene='on']) .flat {
+    display: none;
+  }
+  :global(html[data-scene='on']) .index {
+    display: block;
+  }
+  :global(html[data-scene='on']) .stop:not(.vista) {
+    background: transparent;
+  }
+  :global(html[data-scene='on']) .panel {
+    max-width: 26rem;
+    padding: 1.25rem 1.4rem;
+    background: color-mix(in oklab, var(--cabin-dark) 55%, transparent);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    box-shadow: 0 20px 40px -30px rgb(0 0 0 / 0.8);
+  }
+  :global(html[data-scene='on']) .stop.trail .panel {
+    background: color-mix(in oklab, var(--parchment) 70%, transparent);
+  }
+  :global(html[data-scene='on']) .trail {
+    min-height: 260vh;
+  }
+  :global(html[data-scene='on']) .posts {
+    display: none;
+  }
+  :global(html[data-scene='on']) .corner .wrap,
+  :global(html[data-scene='on']) .desk .wrap,
+  :global(html[data-scene='on']) .cabin-door .wrap {
+    display: grid;
+    align-content: center;
+    min-height: 100vh;
+  }
+  :global(html[data-scene='on']) .porch .post {
+    grid-template-columns: minmax(0, 30rem);
+  }
+</style>

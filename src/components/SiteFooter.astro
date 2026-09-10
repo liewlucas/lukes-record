@@ -1,0 +1,24 @@
+---
+interface Props {
+  text?: string;
+}
+const { text } = Astro.props;
+---
+
+<footer class="colophon">
+  <div class="wrap">
+    <p class="mono">{text ?? `${new Date().getFullYear()}`}</p>
+    <p class="mono">Set in Fraunces, Karla and IBM Plex Mono. Content from Storyblok. Served from the edge.</p>
+  </div>
+</footer>
+
+<style>
+  .colophon {
+    padding: var(--space-4) 0 var(--space-5);
+    opacity: 0.7;
+  }
+  .colophon p {
+    margin: 0.2rem 0;
+    font-size: 0.78rem;
+  }
+</style>

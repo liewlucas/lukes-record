@@ -1,0 +1,84 @@
+---
+import RichText from './RichText.astro';
+import type { Signpost as SignpostModel } from '../lib/types';
+
+interface Props {
+  post: SignpostModel;
+  side?: 'left' | 'right';
+}
+const { post, side = 'left' } = Astro.props;
+const isMarker = Boolean(post.distanceLabel) && !post.body;
+---
+
+<article class:list={['signpost', side, { marker: isMarker }]}>
+  <div class="board">
+    <h2>{post.heading}</h2>
+    {post.distanceLabel && <p class="mono distance">{post.distanceLabel}</p>}
+    <RichText document={post.body} />
+  </div>
+  <div class="post" aria-hidden="true"></div>
+</article>
+
+<style>
+  .signpost {
+    display: grid;
+    justify-items: start;
+    max-width: 30rem;
+  }
+  .signpost.right {
+    justify-items: end;
+    margin-left: auto;
+  }
+  .board {
+    position: relative;
+    padding: 1.1rem 1.4rem 1.2rem;
+    background: var(--cabin-wood);
+    color: var(--kraft);
+    box-shadow: var(--shadow-object);
+    transform: rotate(-0.8deg);
+    border-block: 2px solid #33261b;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 0 100%);
+    padding-right: 2rem;
+  }
+  .right .board {
+    transform: rotate(0.8deg);
+    clip-path: polygon(10px 0, 100% 0, 100% 100%, 10px 100%, 0 50%);
+    padding-left: 2rem;
+    padding-right: 1.4rem;
+  }
+  .board h2 {
+    font-size: var(--step-1);
+    margin: 0 0 0.35rem;
+    color: var(--parchment);
+  }
+  .board :global(.prose) {
+    font-size: 0.95em;
+    max-width: 38ch;
+  }
+  .board :global(.prose p:last-child) {
+    margin-bottom: 0;
+  }
+  .distance {
+    margin: 0;
+    color: var(--lamp-amber);
+  }
+  .marker .board {
+    padding: 0.7rem 1.8rem 0.7rem 1.1rem;
+    display: flex;
+    gap: 1rem;
+    align-items: baseline;
+  }
+  .marker h2 {
+    font-size: var(--step-0);
+    margin: 0;
+  }
+  .post {
+    width: 10px;
+    height: 3.5rem;
+    margin-inline: 2rem;
+    background: linear-gradient(90deg, #3a2a1d, var(--cabin-wood) 60%, #3a2a1d);
+  }
+  .marker .post {
+    height: 2rem;
+  }
+</style>

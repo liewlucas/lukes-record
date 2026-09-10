@@ -1,0 +1,17 @@
+---
+import { storyblokEditable } from '@storyblok/astro';
+import { feature } from '../lib/content';
+
+interface Props {
+  blok: Record<string, unknown> & { _uid: string; component: string };
+}
+const { blok } = Astro.props;
+const model = feature(blok as never);
+---
+
+{model && (
+  <p {...storyblokEditable(blok as never)}>
+    <strong>{model.name}</strong>
+    {model.description && <span> {model.description}</span>}
+  </p>
+)}

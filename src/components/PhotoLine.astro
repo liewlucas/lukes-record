@@ -1,0 +1,105 @@
+---
+/** Prints pegged on a line. Portra-ish grade, white borders, hand-hung tilt. */
+import type { Photo } from '../lib/types';
+
+interface Props {
+  photos: Photo[];
+  limit?: number;
+}
+const { photos, limit } = Astro.props;
+const shown = limit ? photos.slice(0, limit) : photos;
+---
+
+<div class="line">
+  <ul class="prints">
+    {shown.map((p) => (
+      <li style={`--tilt:${p.tilt}deg`}>
+        <a class="print" href={`/cabin/photos/${p.slug}`}>
+          <span class="peg" aria-hidden="true"></span>
+          {p.thumb ? (
+            <img src={p.thumb} alt={p.alt} loading="lazy" width="320" height="240" />
+          ) : (
+            <span class="blank" aria-hidden="true"></span>
+          )}
+          <span class="caption mono">{p.caption ?? p.alt}</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</div>
+
+<style>
+  .line {
+    position: relative;
+    padding-top: 1.5rem;
+  }
+  .line::before {
+    content: '';
+    position: absolute;
+    top: 1.5rem;
+    left: -2rem;
+    right: -2rem;
+    height: 2px;
+    background: repeating-linear-gradient(90deg, #a8926f 0 6px, #7d6b4d 6px 9px);
+    transform: rotate(-0.3deg);
+  }
+  .prints {
+    list-style: none;
+    margin: 0;
+    padding: 0.5rem 0 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem 1.75rem;
+    align-items: flex-start;
+  }
+  .prints li {
+    transform: rotate(var(--tilt));
+    transform-origin: 50% 0;
+  }
+  .print {
+    display: block;
+    position: relative;
+    width: 13.5rem;
+    padding: 0.6rem 0.6rem 1.5rem;
+    background: #fbf8f1;
+    color: var(--walnut);
+    text-decoration: none;
+    box-shadow: 0 14px 30px -18px rgb(0 0 0 / 0.75);
+    transition: transform 0.5s var(--ease-settle), box-shadow 0.5s var(--ease-settle);
+  }
+  .print:hover,
+  .print:focus-visible {
+    transform: translateY(-3px) rotate(calc(var(--tilt) * -0.5));
+    box-shadow:
+      0 0 0 1px rgb(217 164 65 / 0.5),
+      0 18px 34px -16px rgb(217 164 65 / 0.5);
+  }
+  .peg {
+    position: absolute;
+    top: -0.9rem;
+    left: 50%;
+    width: 0.65rem;
+    height: 1.4rem;
+    margin-left: -0.32rem;
+    background: linear-gradient(90deg, #8e7350, #c9ad82 50%, #8e7350);
+    box-shadow: 0 2px 3px rgb(0 0 0 / 0.3);
+  }
+  img,
+  .blank {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    background: linear-gradient(160deg, #c8b79b, #8fa3b0);
+    filter: contrast(0.94) saturate(0.88) sepia(0.14) brightness(1.03);
+  }
+  .caption {
+    display: block;
+    margin-top: 0.55rem;
+    font-size: 0.72rem;
+    opacity: 0.85;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+</style>

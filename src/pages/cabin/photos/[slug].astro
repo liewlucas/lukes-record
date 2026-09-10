@@ -1,0 +1,36 @@
+---
+import Base from '../../../layouts/Base.astro';
+import SceneMount from '../../../components/SceneMount.astro';
+import Lightbox from '../../../components/Lightbox.astro';
+import { getPhotos, getSettings } from '../../../lib/storyblok';
+import type { Photo } from '../../../lib/types';
+
+export async function getStaticPaths() {
+  const photos = await getPhotos();
+  return photos.map((photo, i) => ({
+    params: { slug: photo.slug },
+    props: { photo, prev: photos[i - 1], next: photos[i + 1] },
+  }));
+}
+
+interface Props {
+  photo: Photo;
+  prev?: Photo;
+  next?: Photo;
+}
+const { photo, prev, next } = Astro.props;
+const settings = await getSettings();
+---
+
+<Base title={`${photo.caption ?? photo.alt}, ${settings.ownerName}`} description={photo.caption} zone="cabin" footerText={settings.footerText}>
+  <SceneMount slot="scene" zone="photos" focus={`photo:${photo.slug}`} />
+  <section class="wrap viewing">
+    <Lightbox photo={photo} prev={prev} next={next} />
+  </section>
+</Base>
+
+<style>
+  .viewing {
+    padding-block: var(--space-5) var(--space-4);
+  }
+</style>

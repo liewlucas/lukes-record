@@ -1,0 +1,228 @@
+---
+/** A project as a record: kraft sleeve, spinning disc, liner notes, tracklist, credits. */
+import RichText from './RichText.astro';
+import type { Project } from '../lib/types';
+
+interface Props {
+  project: Project;
+}
+const { project } = Astro.props;
+const initials = project.title
+  .split(/\s+/)
+  .slice(0, 2)
+  .map((w) => w[0]?.toUpperCase() ?? '')
+  .join('');
+---
+
+<article class="record">
+  <div class="player" aria-hidden="true">
+    <div class="disc">
+      <div class="label"><span>{initials}</span></div>
+    </div>
+  </div>
+
+  <div class="sleeve">
+    <header class="head">
+      {project.cover && <img class="cover" src={project.cover.src} alt={project.cover.alt} width="320" height="320" loading="eager" />}
+      <div>
+        <h1>{project.title}</h1>
+        {project.year && <p class="mono year">{project.year}</p>}
+        {project.oneLiner && <p class="lede one-liner">{project.oneLiner}</p>}
+      </div>
+    </header>
+
+    {project.linerNotes && (
+      <section class="notes">
+        <h2>Liner notes</h2>
+        <RichText document={project.linerNotes} serif />
+      </section>
+    )}
+
+    {project.tracklist.length > 0 && (
+      <section>
+        <h2>Tracklist</h2>
+        <ol class="tracks">
+          {project.tracklist.map((t) => (
+            <li>
+              <span class="track-name">{t.name}</span>
+              {t.description && <span class="track-desc">{t.description}</span>}
+            </li>
+          ))}
+        </ol>
+      </section>
+    )}
+
+    {project.stack.length > 0 && (
+      <section>
+        <h2>Recorded with</h2>
+        <ul class="stack">
+          {project.stack.map((s) => <li class="mono">{s}</li>)}
+        </ul>
+      </section>
+    )}
+
+    {project.links.length > 0 && (
+      <section>
+        <h2>Credits</h2>
+        <ul class="credits">
+          {project.links.map((l) => (
+            <li><a class="plaque" href={l.href} rel="noopener">{l.label}</a></li>
+          ))}
+        </ul>
+      </section>
+    )}
+  </div>
+</article>
+
+<style>
+  .record {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    padding-top: 3rem;
+  }
+  @media (min-width: 900px) {
+    .record {
+      grid-template-columns: minmax(0, 40rem) 1fr;
+      gap: 2rem;
+      padding-top: 0;
+    }
+  }
+  .player {
+    position: relative;
+    order: 2;
+    align-self: start;
+    display: grid;
+    place-items: center;
+    padding: 2rem 0;
+  }
+  .disc {
+    width: min(70vw, 22rem);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background:
+      repeating-radial-gradient(circle, #191816 0 1px, #232120 1px 3px),
+      #1c1a18;
+    box-shadow:
+      0 0 0 1px rgb(255 255 255 / 0.06),
+      0 30px 60px -30px rgb(0 0 0 / 0.9);
+    display: grid;
+    place-items: center;
+    animation: spin 6s linear infinite;
+  }
+  .label {
+    width: 34%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%, #f0c46b, var(--lamp-amber) 60%, #a8792a);
+    display: grid;
+    place-items: center;
+    color: var(--walnut);
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    box-shadow: inset 0 0 0 4px rgb(0 0 0 / 0.08);
+  }
+  .label::after {
+    content: '';
+    position: absolute;
+    width: 7%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--cabin-dark);
+  }
+  .sleeve {
+    order: 1;
+    background:
+      var(--grain-soft),
+      linear-gradient(180deg, #ecdfc7, var(--kraft));
+    background-blend-mode: multiply, normal;
+    color: var(--walnut);
+    padding: clamp(1.25rem, 4vw, 3rem);
+    box-shadow:
+      inset 0 0 0 1px rgb(92 70 51 / 0.15),
+      0 30px 60px -30px rgb(0 0 0 / 0.8);
+  }
+  .head {
+    display: grid;
+    gap: 1.5rem;
+    margin-bottom: var(--space-4);
+  }
+  @media (min-width: 560px) {
+    .head:has(.cover) {
+      grid-template-columns: 11rem 1fr;
+      align-items: end;
+    }
+  }
+  .cover {
+    width: 100%;
+    max-width: 11rem;
+    aspect-ratio: 1;
+    object-fit: cover;
+    box-shadow: 0 8px 20px -10px rgb(0 0 0 / 0.6);
+  }
+  h1 {
+    font-size: var(--step-3);
+    margin: 0 0 0.3rem;
+  }
+  h2 {
+    font-size: var(--step-0);
+    font-weight: 600;
+    font-family: var(--font-body);
+    margin: var(--space-4) 0 var(--space-2);
+    padding-bottom: 0.35rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .year {
+    margin: 0 0 0.6rem;
+    opacity: 0.8;
+  }
+  .one-liner {
+    margin: 0;
+  }
+  .tracks {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    counter-reset: track;
+  }
+  .tracks li {
+    counter-increment: track;
+    display: grid;
+    grid-template-columns: 2.2rem 1fr;
+    gap: 0.5rem 0.75rem;
+    padding: 0.55rem 0;
+    border-bottom: 1px dashed var(--line);
+  }
+  .tracks li::before {
+    content: 'A' counter(track);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    opacity: 0.7;
+    padding-top: 0.15rem;
+  }
+  .track-name {
+    font-weight: 500;
+  }
+  .track-desc {
+    grid-column: 2;
+    opacity: 0.85;
+    font-size: 0.95em;
+  }
+  .stack,
+  .credits {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+  }
+  .credits {
+    gap: 0.75rem;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .disc {
+      animation: none;
+    }
+  }
+</style>

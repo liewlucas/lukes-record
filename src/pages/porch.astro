@@ -1,0 +1,13 @@
+---
+import Base from '../layouts/Base.astro';
+import Journey from '../components/Journey.astro';
+import SceneMount from '../components/SceneMount.astro';
+import { getSettings } from '../lib/storyblok';
+
+const settings = await getSettings();
+---
+
+<Base title={`The porch, ${settings.ownerName}`} description="Write a letter, or find me elsewhere." zone="vista" navCurrent="porch" footerText={settings.footerText} navInPage>
+  <SceneMount slot="scene" zone="porch" />
+  <Journey start="porch" />
+</Base>

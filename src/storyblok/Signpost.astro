@@ -1,0 +1,17 @@
+---
+import { storyblokEditable } from '@storyblok/astro';
+import SignpostView from '../components/Signpost.astro';
+import { signpost } from '../lib/content';
+
+interface Props {
+  blok: Record<string, unknown> & { _uid: string; component: string };
+}
+const { blok } = Astro.props;
+const model = signpost(blok as never);
+---
+
+{model && (
+  <div {...storyblokEditable(blok as never)}>
+    <SignpostView post={model} />
+  </div>
+)}

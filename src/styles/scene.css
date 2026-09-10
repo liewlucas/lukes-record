@@ -1,0 +1,76 @@
+/*
+ * Styles that only apply while the 3D layer is actually drawing.
+ *
+ * src/scene/Scene.tsx imports this file and sets html[data-scene='on'] once the canvas exists,
+ * so a visit with no WebGL, a failed context, or a still-loading island never sees any of it —
+ * the 2D layer stays exactly as it was authored. Nothing here hides text or links.
+ */
+
+html[data-scene='on'] {
+  /* Halo colour behind text, per zone. Light zones rest on paper, dark zones on shadow. */
+  --scene-halo: rgb(245 239 226 / 0.92);
+  --scene-wash: rgb(245 239 226 / 0.5);
+}
+
+html[data-scene='on'] body[data-zone='cabin'],
+html[data-scene='on'] body[data-zone='porch'] {
+  --scene-halo: rgb(14 13 10 / 0.85);
+  --scene-wash: rgb(14 13 10 / 0.42);
+}
+
+/* 1. Let the canvas through. The page background is now the scene itself. */
+html[data-scene='on'] body,
+html[data-scene='on'] body[data-zone] {
+  background: transparent;
+}
+
+/* The scene carries its own film grain, so the paper grain drops back to a whisper. */
+html[data-scene='on'] body::after {
+  opacity: 0.035;
+}
+
+/* 2. Retire the CSS stand-in scenery: the 3D layer is now drawing all four of these. */
+html[data-scene='on'] .sky,
+html[data-scene='on'] .lamp-glow,
+html[data-scene='on'] .path {
+  display: none;
+}
+
+html[data-scene='on'] .dusk {
+  background: none;
+}
+
+/* 3. Legibility. A halo, not a panel — text keeps its shape against a moving backdrop. */
+html[data-scene='on'] :is(h1, h2, h3, h4, p, li, dt, dd, figcaption, blockquote, label, summary, .mono) {
+  text-shadow:
+    0 0 2px var(--scene-halo),
+    0 1px 12px var(--scene-halo);
+}
+
+/* Plaques, prints and sleeves are objects with their own surfaces; keep them crisp. */
+html[data-scene='on'] :is(.plaque, .print, .sleeve, .spine, .paper) :is(h1, h2, h3, p, li, span, .mono) {
+  text-shadow: none;
+}
+
+/* A very soft wash under the blocks of standing text that sit directly over open sky. */
+html[data-scene='on'] :is(.words, .trailhead, .doorway, .step, .zone-intro) {
+  background-image: radial-gradient(ellipse 62% 58% at 42% 52%, var(--scene-wash), transparent 72%);
+}
+
+/* 4. Pointer routing. The canvas sits behind the HTML, so links and text win every hit that
+ *    lands on them; the page's empty structural boxes stop swallowing the rest. */
+html[data-scene='on'] body {
+  pointer-events: none;
+}
+
+html[data-scene='on'] .scene-mount:has(canvas) {
+  pointer-events: auto;
+}
+
+html[data-scene='on'] :is(a, button, input, select, textarea, label, summary, details, iframe, [tabindex], [role='button']) {
+  pointer-events: auto;
+}
+
+html[data-scene='on'] :is(h1, h2, h3, h4, p, li, dt, dd, figcaption, blockquote, code, pre, img, picture, svg, table, .plaque, .print, .sleeve, .spine, .paper) {
+  pointer-events: auto;
+}

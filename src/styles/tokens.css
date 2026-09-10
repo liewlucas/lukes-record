@@ -1,0 +1,84 @@
+/* Design tokens. Source: docs/BRIEF.md §4. */
+:root {
+  --parchment: #f5efe2; /* page base, print borders */
+  --kraft: #e9dcc5; /* panels, record sleeves */
+  --lamp-amber: #d9a441; /* glow, highlights, focus rings */
+  --burnt-sienna: #b85c38; /* accents, links, active states; never a background wash */
+  --moss: #6b7d5c; /* nature accents, success */
+  --pine-shadow: #3e4a3d; /* deep greens, dusk UI */
+  --walnut: #5c4633; /* wood, primary text on light */
+  --ridge-haze: #8fa3b0; /* distant mountains, cool rest notes */
+
+  --font-display: 'Fraunces', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+  --font-body: 'Karla', 'Work Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  --ease-settle: cubic-bezier(0.22, 1, 0.36, 1);
+  --measure: 70ch;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--parchment);
+  color: var(--walnut);
+  font-family: var(--font-body);
+  line-height: 1.55;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-variation-settings: 'opsz' 144, 'SOFT' 60;
+  font-weight: 500;
+  line-height: 1.1;
+  margin: 0 0 0.5em;
+  text-wrap: balance;
+}
+
+p,
+li {
+  max-width: var(--measure);
+}
+
+a {
+  color: var(--burnt-sienna);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+}
+
+:focus-visible {
+  outline: 2px solid var(--lamp-amber);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+code,
+kbd,
+samp,
+.mono {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

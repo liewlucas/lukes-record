@@ -1,0 +1,17 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "the-cabin-at-golden-hour",
+  "main": "@astrojs/cloudflare/entrypoints/server",
+  "compatibility_date": "2026-09-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS"
+  },
+  "observability": {
+    "enabled": true
+  }
+  // Secrets (never here): `wrangler secret put STORYBLOK_TOKEN` for production,
+  // `.dev.vars` for `wrangler dev`. Build-time values live in `.env` locally and in
+  // the Worker's build variables on Cloudflare.
+}

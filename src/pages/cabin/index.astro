@@ -1,0 +1,13 @@
+---
+import Base from '../../layouts/Base.astro';
+import Journey from '../../components/Journey.astro';
+import SceneMount from '../../components/SceneMount.astro';
+import { getSettings } from '../../lib/storyblok';
+
+const settings = await getSettings();
+---
+
+<Base title={`The cabin, ${settings.ownerName}`} description="Projects as records, photographs on a line, books with notes tucked inside." zone="vista" navCurrent="cabin" footerText={settings.footerText} navInPage>
+  <SceneMount slot="scene" zone="vinyl" />
+  <Journey start="vinyl" />
+</Base>

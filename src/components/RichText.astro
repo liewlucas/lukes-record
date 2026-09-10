@@ -1,0 +1,17 @@
+---
+import StoryblokRichText from '@storyblok/astro/StoryblokRichText.astro';
+import type { RichText as RichTextDoc } from '../lib/types';
+
+interface Props {
+  document?: RichTextDoc;
+  serif?: boolean;
+  class?: string;
+}
+const { document, serif = false, class: className } = Astro.props;
+---
+
+{document && (
+  <div class:list={['prose', { serif }, className]}>
+    <StoryblokRichText document={document} />
+  </div>
+)}

@@ -1,0 +1,36 @@
+---
+import Base from '../../../layouts/Base.astro';
+import SceneMount from '../../../components/SceneMount.astro';
+import LinerNotes from '../../../components/LinerNotes.astro';
+import { getProjects, getSettings } from '../../../lib/storyblok';
+import type { Project } from '../../../lib/types';
+
+export async function getStaticPaths() {
+  const projects = await getProjects();
+  return projects.map((project) => ({ params: { slug: project.slug }, props: { project } }));
+}
+
+interface Props {
+  project: Project;
+}
+const { project } = Astro.props;
+const settings = await getSettings();
+---
+
+<Base title={`${project.title}, ${settings.ownerName}`} description={project.oneLiner} zone="cabin" footerText={settings.footerText}>
+  <SceneMount slot="scene" zone="vinyl" focus={project.slug} />
+  <div class="wrap listening">
+    <p class="mono back"><a href="/cabin#vinyl">back to the shelf</a></p>
+    <LinerNotes project={project} />
+  </div>
+</Base>
+
+<style>
+  .listening {
+    padding-block: var(--space-5) var(--space-4);
+  }
+  .back {
+    margin: 0 0 var(--space-3);
+    font-size: 0.8rem;
+  }
+</style>

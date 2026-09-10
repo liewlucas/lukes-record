@@ -1,0 +1,34 @@
+---
+/**
+ * Mount point for the single React Three Fiber island (src/scene). Renders behind the HTML layer.
+ * The island decides at runtime whether to draw (WebGL, motion preference, device capability);
+ * when it declines, the 2D layer you are reading is the whole site.
+ */
+import Scene from '../scene/Scene';
+import { getSceneData } from '../lib/storyblok';
+import type { Zone } from '../scene/types';
+
+interface Props {
+  zone: Zone;
+  /** Optional deep-link focus, e.g. a project slug to open on arrival. */
+  focus?: string;
+}
+const { zone, focus } = Astro.props;
+const data = await getSceneData();
+---
+
+<div class="scene-mount" data-zone={zone} aria-hidden="true">
+  <Scene client:only="react" zone={zone} focus={focus} data={data} />
+</div>
+
+<style>
+  .scene-mount {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+  }
+  .scene-mount:has(canvas) {
+    pointer-events: auto;
+  }
+</style>

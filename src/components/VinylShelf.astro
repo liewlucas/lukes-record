@@ -1,0 +1,111 @@
+---
+/** Records on a shelf, spines readable. Each spine is a link to its liner notes. */
+import { hashUnit } from '../lib/content';
+import type { Project } from '../lib/types';
+
+interface Props {
+  projects: Project[];
+}
+const { projects } = Astro.props;
+const sleeves = ['var(--kraft)', 'var(--burnt-sienna)', 'var(--moss)', 'var(--ridge-haze)', '#3d3129', '#c9b48d'];
+/** A spine has room for one year; the sleeve shows the full range. */
+const spineYear = (y?: string) => y?.match(/\d{4}/)?.[0] ?? y;
+const inkFor = (i: number) => (i === 0 || i === 5 ? 'var(--walnut)' : 'var(--parchment)');
+---
+
+<div class="shelf">
+  <div class="row" role="list">
+  {projects.map((p) => {
+    const i = Math.abs(Math.round(hashUnit(p.slug) * 50)) % sleeves.length;
+    return (
+      <a
+        role="listitem"
+        class:list={['spine', { featured: p.featured }]}
+        href={`/cabin/vinyl/${p.slug}`}
+        style={`--sleeve:${sleeves[i]};--ink:${inkFor(i)}`}
+        aria-label={`${p.title}${p.year ? `, ${p.year}` : ''}`}
+      >
+        <span class="title">{p.title}</span>
+        {p.year && <span class="mono year">{spineYear(p.year)}</span>}
+      </a>
+    );
+  })}
+  </div>
+  <div class="plank" aria-hidden="true"></div>
+</div>
+
+<style>
+  .shelf {
+    position: relative;
+    padding-bottom: 14px;
+  }
+  .row {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    padding: 1.25rem 1.25rem 0;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+  .spine {
+    flex: 0 0 auto;
+    width: 3.1rem;
+    height: 15rem;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    align-items: center;
+    justify-items: center;
+    padding: 0.8rem 0;
+    background: var(--sleeve);
+    color: var(--ink);
+    text-decoration: none;
+    box-shadow:
+      inset 2px 0 0 rgb(255 255 255 / 0.12),
+      inset -2px 0 0 rgb(0 0 0 / 0.18);
+    transition: transform 0.5s var(--ease-settle), box-shadow 0.5s var(--ease-settle);
+    position: relative;
+    z-index: 1;
+  }
+  .spine.featured {
+    transform: translateY(-0.6rem);
+  }
+  .spine:hover,
+  .spine:focus-visible {
+    transform: translateY(-1.1rem);
+    box-shadow:
+      inset 2px 0 0 rgb(255 255 255 / 0.12),
+      inset -2px 0 0 rgb(0 0 0 / 0.18),
+      0 0 0 1px rgb(217 164 65 / 0.6),
+      0 12px 28px -10px rgb(217 164 65 / 0.55);
+  }
+  .title {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-family: var(--font-display);
+    font-variation-settings: 'opsz' 18, 'SOFT' 50;
+    font-size: 1.05rem;
+    line-height: 1;
+    white-space: nowrap;
+    max-height: 11rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .year {
+    font-size: 0.68rem;
+    opacity: 0.8;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    white-space: nowrap;
+    max-height: 3.2rem;
+    overflow: hidden;
+  }
+  .plank {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 14px;
+    background: linear-gradient(180deg, #5b4531, #3a2a1d);
+    box-shadow: 0 10px 20px -8px rgb(0 0 0 / 0.6);
+  }
+</style>

@@ -1,0 +1,125 @@
+---
+/**
+ * Contact as writing a letter. Phase 2 posts via mailto so it works with no backend;
+ * a Worker endpoint can replace the action in Phase 5 without changing the markup.
+ */
+interface Props {
+  email?: string;
+}
+const { email } = Astro.props;
+const action = email ? `mailto:${email}` : undefined;
+---
+
+<form class="letter" method="post" action={action} enctype="text/plain">
+  <p class="mono date">{new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+  <p class="salutation">To the cabin,</p>
+
+  <label>
+    <span class="mono">Your message</span>
+    <textarea name="body" rows="7" required placeholder="Write as you would on paper."></textarea>
+  </label>
+
+  <div class="signoff">
+    <label>
+      <span class="mono">From</span>
+      <input name="name" type="text" required autocomplete="name" />
+    </label>
+    <label>
+      <span class="mono">Reply to</span>
+      <input name="reply_to" type="email" required autocomplete="email" />
+    </label>
+  </div>
+
+  <div class="send">
+    <button class="plaque" type="submit" disabled={!action}>Send letter</button>
+    {!action && <p class="mono note">Add an email address to the site settings to open the letterbox.</p>}
+  </div>
+</form>
+
+<style>
+  .letter {
+    position: relative;
+    max-width: 38rem;
+    padding: clamp(1.4rem, 4vw, 2.6rem) clamp(1.2rem, 4vw, 2.4rem) 2rem;
+    background:
+      var(--grain-soft),
+      repeating-linear-gradient(180deg, transparent 0 1.85rem, rgb(92 70 51 / 0.12) 1.85rem calc(1.85rem + 1px)),
+      #f7f1e4;
+    background-blend-mode: multiply, normal, normal;
+    color: var(--walnut);
+    box-shadow:
+      0 1px 0 rgb(255 255 255 / 0.6) inset,
+      0 30px 60px -30px rgb(0 0 0 / 0.8);
+    transform: rotate(-0.4deg);
+  }
+  .date {
+    margin: 0 0 1.2rem;
+    text-align: right;
+    font-size: 0.78rem;
+    opacity: 0.7;
+  }
+  .salutation {
+    font-family: var(--font-display);
+    font-size: var(--step-1);
+    margin: 0 0 1rem;
+  }
+  label {
+    display: grid;
+    gap: 0.3rem;
+    margin-bottom: 1.2rem;
+  }
+  label .mono {
+    font-size: 0.72rem;
+    opacity: 0.7;
+  }
+  textarea,
+  input {
+    font: inherit;
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    line-height: 1.85rem;
+    color: var(--walnut);
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid rgb(92 70 51 / 0.35);
+    padding: 0.1rem 0;
+    resize: vertical;
+  }
+  textarea:focus-visible,
+  input:focus-visible {
+    outline: none;
+    border-bottom-color: var(--lamp-amber);
+    box-shadow: 0 1px 0 var(--lamp-amber);
+  }
+  .signoff {
+    display: grid;
+    gap: 0 1.5rem;
+  }
+  @media (min-width: 560px) {
+    .signoff {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .send {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.5rem;
+  }
+  button.plaque {
+    cursor: pointer;
+    font: inherit;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+  }
+  button.plaque:disabled {
+    filter: grayscale(0.6);
+    cursor: not-allowed;
+  }
+  .note {
+    margin: 0;
+    font-size: 0.75rem;
+    opacity: 0.75;
+  }
+</style>

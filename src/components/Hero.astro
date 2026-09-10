@@ -1,0 +1,155 @@
+---
+/** Zone 1, the arrival vista. The one orchestrated page-load moment lives here. */
+import type { Settings } from '../lib/types';
+
+interface Props {
+  settings: Settings;
+}
+const { settings } = Astro.props;
+---
+
+<section class="vista" aria-labelledby="owner">
+  <div class="sky" aria-hidden="true">
+    <div class="sun"></div>
+    <svg class="ridge far" viewBox="0 0 1440 320" preserveAspectRatio="none">
+      <path d="M0 220 L120 170 L260 210 L400 120 L540 190 L700 90 L860 170 L1000 130 L1180 200 L1300 150 L1440 190 L1440 320 L0 320 Z" />
+    </svg>
+    <div class="mist"></div>
+    <svg class="ridge mid" viewBox="0 0 1440 320" preserveAspectRatio="none">
+      <path d="M0 260 L160 215 L300 245 L470 180 L620 240 L780 175 L930 235 L1080 200 L1240 250 L1440 210 L1440 320 L0 320 Z" />
+    </svg>
+    <svg class="ridge near" viewBox="0 0 1440 320" preserveAspectRatio="none">
+      <path d="M0 300 L120 275 L240 292 L380 262 L520 290 L660 258 L820 288 L960 270 L1120 292 L1280 268 L1440 285 L1440 320 L0 320 Z" />
+    </svg>
+  </div>
+
+  <div class="wrap words">
+    <h1 id="owner" class="name">{settings.ownerName}</h1>
+    {settings.tagline && <p class="lede tagline">{settings.tagline}</p>}
+    <div class="affordances">
+      <a class="follow" href="#trail">
+        <span>follow the trail</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5" /></svg>
+      </a>
+      <a class="skip-to-work" href="#vinyl">{settings.heroSkipLabel}</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .vista {
+    position: relative;
+    min-height: 100dvh;
+    display: grid;
+    align-items: end;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .sky {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(180deg, #f3d6a6 0%, #f5e3c4 38%, #ede4d3 62%, var(--parchment) 100%);
+  }
+  .sun {
+    position: absolute;
+    left: 62%;
+    top: 30%;
+    width: 22vmin;
+    height: 22vmin;
+    border-radius: 50%;
+    background: radial-gradient(circle, #ffe7b3 0%, var(--lamp-amber) 55%, transparent 72%);
+    filter: blur(2px);
+    opacity: 0.9;
+  }
+  .sun::after {
+    content: '';
+    position: absolute;
+    inset: -60%;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgb(217 164 65 / 0.35), transparent 65%);
+  }
+  .ridge {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 55%;
+  }
+  .ridge.far {
+    fill: var(--ridge-haze);
+    opacity: 0.75;
+  }
+  .ridge.mid {
+    fill: color-mix(in oklab, var(--ridge-haze) 45%, var(--pine-shadow));
+    height: 46%;
+  }
+  .ridge.near {
+    fill: var(--pine-shadow);
+    height: 34%;
+  }
+  .mist {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 18%;
+    height: 22%;
+    background: linear-gradient(180deg, transparent, rgb(245 239 226 / 0.85) 50%, transparent);
+    filter: blur(10px);
+  }
+  .words {
+    position: relative;
+    padding-block: var(--space-6) var(--space-5);
+  }
+  .name {
+    font-size: var(--step-4);
+    font-weight: 400;
+    letter-spacing: -0.015em;
+    margin: 0 0 var(--space-2);
+    max-width: 14ch;
+    animation: settle 1.6s var(--ease-settle) both;
+  }
+  .tagline {
+    margin: 0 0 var(--space-4);
+    animation: settle 1.6s var(--ease-settle) 0.35s both;
+  }
+  .affordances {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3) var(--space-4);
+    animation: settle 1.6s var(--ease-settle) 0.6s both;
+  }
+  .follow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--walnut);
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-size: 0.92rem;
+  }
+  .follow svg {
+    animation: bob 2.4s ease-in-out infinite;
+  }
+  .follow:hover span {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+  .skip-to-work {
+    font-family: var(--font-display);
+    font-variation-settings: 'opsz' 24, 'SOFT' 80;
+    font-size: var(--step-1);
+    color: var(--burnt-sienna);
+    text-decoration-thickness: 1px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .name,
+    .tagline,
+    .affordances,
+    .follow svg {
+      animation: none;
+    }
+  }
+</style>

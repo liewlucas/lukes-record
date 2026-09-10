@@ -1,0 +1,32 @@
+# build output
+dist/
+.astro/
+.wrangler/
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# environment variables and secrets
+.env
+.env.*
+!.env.example
+.dev.vars
+.dev.vars.*
+
+# generated types
+worker-configuration.d.ts
+
+# macOS / editors
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# browser tooling output
+.playwright-mcp/

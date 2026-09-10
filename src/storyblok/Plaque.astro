@@ -1,0 +1,12 @@
+---
+import { storyblokEditable } from '@storyblok/astro';
+import { plaque } from '../lib/content';
+
+interface Props {
+  blok: Record<string, unknown> & { _uid: string; component: string };
+}
+const { blok } = Astro.props;
+const model = plaque(blok as never);
+---
+
+{model && <a {...storyblokEditable(blok as never)} class="plaque" href={model.href} rel="me noopener">{model.label}</a>}

@@ -1,0 +1,50 @@
+---
+import '../styles/global.css';
+import SiteNav from '../components/SiteNav.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  zone: 'vista' | 'trail' | 'cabin' | 'porch';
+  footerText?: string;
+  /** Keep the page out of search indexes (preview route). */
+  noindex?: boolean;
+  /** Hide the trail-marker nav (hero handles its own affordances). */
+  hideNav?: boolean;
+  /** Which trail marker is lit; defaults to the zone. */
+  navCurrent?: 'vista' | 'trail' | 'cabin' | 'porch';
+  /** Nav markers scroll in place (journey page) instead of navigating. */
+  navInPage?: boolean;
+}
+
+const { title, description, zone, footerText, noindex = false, hideNav = false, navCurrent = zone, navInPage = false } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    {description && <meta name="description" content={description} />}
+    {noindex ? <meta name="robots" content="noindex, nofollow" /> : <link rel="canonical" href={canonical} />}
+    <meta name="theme-color" content={zone === 'cabin' ? '#2b322a' : zone === 'porch' ? '#566a75' : '#f5efe2'} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..700,0..100;1,9..144,300..700,0..100&family=Karla:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    />
+  </head>
+  <body data-zone={zone}>
+    <a class="skip" href="#main">Skip to content</a>
+    {!hideNav && <SiteNav current={navCurrent} inPage={navInPage} />}
+    <slot name="scene" />
+    <main id="main">
+      <slot />
+    </main>
+    <SiteFooter text={footerText} />
+  </body>
+</html>

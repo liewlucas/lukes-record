@@ -1,0 +1,78 @@
+---
+/**
+ * Storyblok Visual Editor preview. The only route rendered on the Worker at request time
+ * and the only runtime consumer of the Storyblok API (docs/BRIEF.md §3).
+ *
+ * Set the space's Visual Editor preview URL to `https://<site>/preview/`; Storyblok appends
+ * the story's full slug. Responses are noindex and uncached.
+ */
+export const prerender = false;
+
+import { isEditorRequest, useStoryblokApi, type ISbStoryData } from '@storyblok/astro';
+import StoryblokComponent from '@storyblok/astro/StoryblokComponent.astro';
+import Base from '../../layouts/Base.astro';
+import { storyblokEnabled } from '../../lib/storyblok';
+
+const previewHeaders = {
+  'X-Robots-Tag': 'noindex, nofollow',
+  'Cache-Control': 'no-store',
+};
+for (const [k, v] of Object.entries(previewHeaders)) Astro.response.headers.set(k, v);
+
+const plain = (body: string, status: number) =>
+  new Response(body, { status, headers: { 'Content-Type': 'text/plain; charset=utf-8', ...previewHeaders } });
+
+const url = new URL(Astro.request.url);
+const editorRequest = isEditorRequest(url);
+
+if (!editorRequest && !import.meta.env.DEV) {
+  return plain('Preview is only available inside the Storyblok Visual Editor.', 403);
+}
+
+if (!storyblokEnabled) {
+  return plain('STORYBLOK_TOKEN was not set at build time, so preview is disabled.', 503);
+}
+
+const slug = (Astro.params.slug ?? '').replace(/\/+$/, '') || 'home';
+
+let story: ISbStoryData | null = null;
+try {
+  const { data } = await useStoryblokApi().get(`cdn/stories/${slug}`, {
+    version: 'draft',
+    cv: Date.now(),
+  });
+  story = data.story;
+} catch {
+  story = null;
+}
+
+if (!story) {
+  return plain(`No draft story at "${slug}".`, 404);
+}
+
+const component = String(story.content?.component ?? '');
+const zone = /project|photo|book/.test(component) ? 'cabin' : slug === 'porch' ? 'porch' : slug === 'trail' ? 'trail' : 'vista';
+---
+
+<Base title={`Preview: ${story.name}`} zone={zone} noindex hideNav>
+  <StoryblokComponent blok={story.content} slug={story.slug} name={story.name} />
+</Base>
+
+<script>
+  import { loadStoryblokBridge } from '@storyblok/astro';
+
+  loadStoryblokBridge().then(() => {
+    const { StoryblokBridge } = window as unknown as { StoryblokBridge: new (options?: object) => any };
+    const bridge = new StoryblokBridge({ preventClicks: true });
+    bridge.on(['published', 'change'], (event: { slugChanged?: boolean }) => {
+      if (!event.slugChanged) window.location.reload();
+    });
+    // Phase 0: reload on save. Live per-keystroke rendering is a later polish item.
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    bridge.on('input', () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => window.location.reload(), 800);
+    });
+  });
+</script>
+

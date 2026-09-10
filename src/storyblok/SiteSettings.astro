@@ -1,0 +1,21 @@
+---
+/** Visual Editor renderer for `site_settings` (and the space's existing `settings`). */
+import { storyblokEditable } from '@storyblok/astro';
+import Hero from '../components/Hero.astro';
+import Plaques from '../components/Plaques.astro';
+import { settings } from '../lib/content';
+import { defaultSettings } from '../lib/placeholders';
+
+interface Props {
+  blok: Record<string, unknown> & { _uid: string; component: string };
+}
+const { blok } = Astro.props;
+const model = settings({ slug: 'settings', full_slug: 'settings', name: 'settings', content: blok }, defaultSettings);
+---
+
+<div {...storyblokEditable(blok as never)}>
+  <Hero settings={model} />
+  <div class="wrap" style="padding-block: 2rem 4rem">
+    <Plaques items={model.social} />
+  </div>
+</div>

@@ -1,0 +1,85 @@
+---
+/** The desk in the corner: a warm amber terminal, a wink at the day job. */
+import type { Plaque } from '../lib/types';
+
+interface Props {
+  ownerName: string;
+  social: Plaque[];
+  projectCount: number;
+}
+const { ownerName, social, projectCount } = Astro.props;
+const github = social.find((s) => /github/i.test(s.label) || /github\.com/i.test(s.href));
+const user = (ownerName.split(/\s+/)[0] ?? 'owner').toLowerCase().replace(/[^a-z0-9]/g, '') || 'owner';
+---
+
+<div class="desk">
+  <div class="terminal" aria-label="Terminal">
+    <pre class="mono"><span class="prompt">{user}@cabin</span> <span class="dim">~</span> $ ls work/
+<span class="out">{projectCount} record{projectCount === 1 ? '' : 's'} on the shelf</span>
+<span class="prompt">{user}@cabin</span> <span class="dim">~</span> $ git remote -v
+<span class="out">{github ? github.href.replace(/^https?:\/\//, '') : 'origin  (not set)'}</span>
+<span class="prompt">{user}@cabin</span> <span class="dim">~</span> $ <span class="cursor">▍</span></pre>
+    {github && <a class="mono open" href={github.href} rel="me noopener">open on GitHub</a>}
+  </div>
+  <div class="lamp" aria-hidden="true"></div>
+</div>
+
+<style>
+  .desk {
+    position: relative;
+    max-width: 34rem;
+  }
+  .terminal {
+    position: relative;
+    background: #17150f;
+    padding: 1.1rem 1.25rem 1rem;
+    box-shadow:
+      inset 0 0 0 1px rgb(217 164 65 / 0.25),
+      0 0 40px -10px rgb(217 164 65 / 0.45),
+      0 30px 50px -30px rgb(0 0 0 / 0.9);
+    color: #e6b95a;
+  }
+  pre {
+    margin: 0;
+    font-size: 0.82rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    text-shadow: 0 0 6px rgb(217 164 65 / 0.45);
+  }
+  .prompt {
+    color: #f1cf86;
+  }
+  .dim {
+    opacity: 0.55;
+  }
+  .out {
+    color: #d9c3a1;
+  }
+  .cursor {
+    animation: blink 1.1s steps(1) infinite;
+  }
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+  .open {
+    display: inline-block;
+    margin-top: 0.75rem;
+    font-size: 0.78rem;
+    color: var(--lamp-amber);
+  }
+  .lamp {
+    position: absolute;
+    inset: -40% -20% auto;
+    height: 120%;
+    background: radial-gradient(ellipse at 30% 0%, rgb(217 164 65 / 0.22), transparent 60%);
+    pointer-events: none;
+    z-index: -1;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cursor {
+      animation: none;
+    }
+  }
+</style>

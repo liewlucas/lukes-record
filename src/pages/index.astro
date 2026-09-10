@@ -1,0 +1,13 @@
+---
+import Base from '../layouts/Base.astro';
+import Journey from '../components/Journey.astro';
+import SceneMount from '../components/SceneMount.astro';
+import { getSettings } from '../lib/storyblok';
+
+const settings = await getSettings();
+---
+
+<Base title={`${settings.ownerName}`} description="One continuous walk: a golden-hour vista, a pine trail, a warm cabin where the work lives, and a porch to write from." zone="vista" navCurrent="vista" footerText={settings.footerText} hideNav>
+  <SceneMount slot="scene" zone="vista" />
+  <Journey start="vista" />
+</Base>

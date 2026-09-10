@@ -1,0 +1,13 @@
+---
+import Base from '../layouts/Base.astro';
+import Journey from '../components/Journey.astro';
+import SceneMount from '../components/SceneMount.astro';
+import { getSettings } from '../lib/storyblok';
+
+const settings = await getSettings();
+---
+
+<Base title={`The trail, ${settings.ownerName}`} description="A walk down the pine trail: who I am and what I work with." zone="vista" navCurrent="trail" footerText={settings.footerText} navInPage>
+  <SceneMount slot="scene" zone="trail" />
+  <Journey start="trail" />
+</Base>

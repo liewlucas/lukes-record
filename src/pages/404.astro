@@ -1,0 +1,23 @@
+---
+import Base from '../layouts/Base.astro';
+import { getSettings } from '../lib/storyblok';
+
+const settings = await getSettings();
+---
+
+<Base title={`Off the trail, ${settings.ownerName}`} zone="trail" footerText={settings.footerText} noindex>
+  <section class="wrap lost">
+    <h1 class="zone-title">You've wandered off the trail</h1>
+    <p class="zone-intro">There's nothing at this address but pine needles. The cabin is that way.</p>
+    <p><a href="/cabin">to the cabin</a> or <a href="/">back to the vista</a></p>
+  </section>
+</Base>
+
+<style>
+  .lost {
+    min-height: 70dvh;
+    display: grid;
+    align-content: center;
+    padding-block: var(--space-6);
+  }
+</style>
