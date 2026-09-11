@@ -104,14 +104,24 @@ export function getPage(slug: 'trail' | 'porch'): Promise<Page> {
   });
 }
 
+/**
+ * Storyblok's asset CDN has no CORS headers, so textures must come from our origin.
+ * Routes a Storyblok asset URL through src/pages/img/[...path].ts; other URLs pass untouched.
+ */
+export function textureUrl(src?: string): string | undefined {
+  if (!src) return undefined;
+  const m = src.match(/^https?:\/\/a\.storyblok\.com\/(f\/\d+\/\d+x\d+\/[a-f0-9]+\/[^/?#]+)/i);
+  return m ? `/img/${m[1]}` : src;
+}
+
 /** Everything the 3D island needs, trimmed to what it draws. */
 export async function getSceneData(): Promise<import('../scene/types').SceneData> {
   const [settings, projects, photos, books, trail] = await Promise.all([getSettings(), getProjects(), getPhotos(), getBooks(), getPage('trail')]);
   return {
     ownerName: settings.ownerName,
     tagline: settings.tagline,
-    records: projects.map((p) => ({ slug: p.slug, title: p.title, year: p.year, featured: p.featured, cover: p.cover?.src, href: `/cabin/vinyl/${p.slug}` })),
-    prints: photos.map((p) => ({ slug: p.slug, src: p.thumb, caption: p.caption, tilt: p.tilt, href: `/cabin/photos/${p.slug}` })),
+    records: projects.map((p) => ({ slug: p.slug, title: p.title, year: p.year, featured: p.featured, cover: textureUrl(p.cover?.src), href: `/cabin/vinyl/${p.slug}` })),
+    prints: photos.map((p) => ({ slug: p.slug, src: textureUrl(p.thumb), caption: p.caption, tilt: p.tilt, href: `/cabin/photos/${p.slug}` })),
     books: books.map((b) => ({ slug: b.slug, title: b.title, spineColor: b.spineColor, href: `/cabin/books#${b.slug}` })),
     signposts: trail.signposts.map((s) => ({ heading: s.heading, distanceLabel: s.distanceLabel })),
   };

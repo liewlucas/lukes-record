@@ -13,16 +13,45 @@ export const PALETTE = {
   ridgeHaze: '#8FA3B0',
 } as const;
 
-/** Derived surfaces, matched to the 2D layer's --cabin-dark / --cabin-wood / --dusk. */
+/**
+ * Derived surfaces. Everything here is a mix of two palette tokens or a value the palette
+ * implies (the sun is a hotter parchment, the dusk is a colder ridge-haze), so the scene never
+ * introduces a ninth colour.
+ */
 export const SURFACE = {
+  /** Wood, warmest first. */
+  woodLight: '#7A5C3C',
+  woodMid: '#5C4633',
+  woodDark: '#3F2F22',
+  woodFloor: '#4E3A29',
+  bark: '#493525',
+  /** Masonry and hearth. */
+  stone: '#6A6058',
+  stoneDark: '#4A423B',
+  soot: '#241E19',
+  ember: '#C24A22',
+  flame: '#F0A03C',
+  /** Sky, golden hour. */
+  skyZenith: '#9FB6C4',
+  skyMid: '#F0CE9C',
+  skyHorizon: '#F7DCB4',
+  skyBelow: '#B9A585',
+  sunCore: '#FFF1D2',
+  sunHalo: '#FFCE86',
+  /** Sky, dusk on the porch. */
+  duskZenith: '#1E2833',
+  duskMid: '#41525F',
+  duskHorizon: '#B5713F',
+  duskBelow: '#1B2019',
+  /** Interiors. */
   cabinDark: '#2B322A',
-  cabinWood: '#4A3828',
-  dusk: '#566A75',
-  duskDeep: '#39464C',
-  skyHigh: '#F3D6A6',
-  skyLow: '#F5E3C4',
-  sunCore: '#FFE7B3',
-  glass: '#F0C46B',
+  plaster: '#8C7B63',
+  glassLit: '#F2CE8A',
+  brass: '#C9A15A',
+  /** Ground cover. */
+  meadow: '#7C8A5F',
+  dirt: '#9B7F58',
+  dirtDark: '#6E5637',
 } as const;
 
 /** Storyblok `spine_color` is a palette token name (src/lib/types.ts SPINE_COLORS). */
@@ -42,13 +71,15 @@ export function spineHex(token: string | undefined): string {
   return SPINE_HEX[token] ?? (/^#[0-9a-f]{3,8}$/i.test(token) ? token : PALETTE.moss);
 }
 
-/** Sleeve colours for the vinyl spines, cycled so a shelf never reads as one block. */
-export const SLEEVE_CYCLE = [PALETTE.burntSienna, PALETTE.moss, PALETTE.walnut, PALETTE.ridgeHaze, PALETTE.pineShadow, PALETTE.lampAmber] as const;
+/** Sleeve colours for the record spines, cycled so a shelf never reads as one block. */
+export const SLEEVE_CYCLE = [
+  PALETTE.burntSienna,
+  PALETTE.moss,
+  PALETTE.walnut,
+  PALETTE.ridgeHaze,
+  PALETTE.pineShadow,
+  PALETTE.lampAmber,
+] as const;
 
-/** Clear colour per zone, painted before the zone chunk has loaded so nothing flashes black. */
-export const ZONE_BACKDROP = {
-  vista: SURFACE.skyLow,
-  trail: '#C9B48A',
-  cabin: '#171712',
-  porch: SURFACE.duskDeep,
-} as const;
+/** Painted before the first frame so nothing flashes black while the island boots. */
+export const CLEAR_COLOUR = SURFACE.skyHorizon;

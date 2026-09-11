@@ -144,6 +144,21 @@ const { settings } = Astro.props;
     color: var(--burnt-sienna);
     text-decoration-thickness: 1px;
   }
+  /* Over the 3D meadow the words need ground to stand on. */
+  :global(html[data-scene='on']) .words {
+    padding: var(--space-4) var(--space-4) var(--space-4);
+    margin-bottom: var(--space-5);
+    width: auto;
+    max-width: 44rem;
+    margin-left: clamp(1.25rem, 6vw, 5rem);
+    background: color-mix(in oklab, var(--parchment) 78%, transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 30px 60px -40px rgb(60 40 20 / 0.6);
+  }
+  :global(html[data-scene='on']) .vista {
+    align-items: end;
+  }
   @media (prefers-reduced-motion: reduce) {
     .name,
     .tagline,
